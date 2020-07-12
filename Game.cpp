@@ -3,6 +3,8 @@
 #include "Game.h"
 #include "EntityManager.h"
 
+using namespace std;
+
 const float Game::PlayerSpeed = 100.f;
 const sf::Time Game::TimePerFrame = sf::seconds(1.f / 60.f);
 
@@ -57,6 +59,7 @@ Game::Game()
 		se->m_size = _TextureEchelle.getSize();
 		se->m_position = _Echelle[i].getPosition();
 		EntityManager::m_Entities.push_back(se);
+
 	}
 
 	// Draw Mario
@@ -84,6 +87,24 @@ Game::Game()
 	mStatisticsText.setFont(mFont);
 	mStatisticsText.setPosition(5.f, 5.f);
 	mStatisticsText.setCharacterSize(10);
+
+	//Draw Bruno
+
+	mTextureBruno.loadFromFile("Media/Textures/bruno.png");
+	_sizeBrunoFernandes = mTextureBruno.getSize();
+	mBrunoFernandes.setTexture(mTextureBruno);
+	sf::Vector2f posBruno;
+	posBruno.x = 626.649;
+	posBruno.y = 18.3537;
+
+	mBrunoFernandes.setPosition(posBruno);
+
+	std::shared_ptr<Entity> bruno = std::make_shared<Entity>();
+	bruno->m_sprite = mBrunoFernandes;
+	bruno->m_type = EntityType::bruno;
+	bruno->m_size = mTextureBruno.getSize();
+	bruno->m_position = mBrunoFernandes.getPosition();
+	EntityManager::m_Entities.push_back(bruno);
 }
 
 void Game::run()
@@ -129,16 +150,17 @@ void Game::processEvents()
 	}
 }
 
-void Game::update(sf::Time elapsedTime)
-{
+void Game::update(sf::Time elapsedTime){
+	
+
 	sf::Vector2f movement(0.f, 0.f);
-	if (mIsMovingUp)
+	if (mIsMovingUp && moveUp)
 		movement.y -= PlayerSpeed;
-	if (mIsMovingDown)
+	if (mIsMovingDown && moveDown)
 		movement.y += PlayerSpeed;
-	if (mIsMovingLeft)
+	if (mIsMovingLeft && moveLeft)
 		movement.x -= PlayerSpeed;
-	if (mIsMovingRight)
+	if (mIsMovingRight && moveRight)
 		movement.x += PlayerSpeed;
 
 	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)
@@ -172,6 +194,15 @@ void Game::render()
 	}
 
 	mWindow.draw(mStatisticsText);
+
+	if (Victory()) {
+		mVictory.setFillColor(sf::Color::White);
+		mVictory.setFont(mFont);
+		mVictory.setPosition(150.f, 200.f);
+		mVictory.setCharacterSize(50);
+		mVictory.setString("Vous avez gagné \nAppuyez sur A pour rejouer");
+		mWindow.draw(mVictory);
+	}
 	mWindow.display();
 }
 
@@ -190,14 +221,113 @@ void Game::updateStatistics(sf::Time elapsedTime)
 		mStatisticsNumFrames = 0;
 	}
 
-	//
-	// Handle collision
-	//
+	MovePlayer();
 
 	if (mStatisticsUpdateTime >= sf::seconds(0.050f))
 	{
 		// Handle collision weapon enemies
 	}
+
+	Victory();
+}
+
+void Game::RestartGame(){
+	std::shared_ptr<Entity> player = EntityManager::GetPlayer();
+	player->m_sprite.setPosition(100.f + 70.f, BLOCK_SPACE * 5 - _sizeMario.y);
+}
+
+void Game::MovePlayer() {
+
+	std::shared_ptr<Entity> player = EntityManager::GetPlayer();
+
+	std::cout << player->m_sprite.getPosition().y << std::endl;
+
+	std::cout << player->m_sprite.getPosition().x << std::endl;
+
+
+
+	if (player->m_sprite.getPosition().x > 168.33 && player->m_sprite.getPosition().x < 688.314) {
+		moveDown = false;
+		moveUp = false;
+		moveRight = true;
+		moveLeft = true;
+	
+	}
+	else if (player->m_sprite.getPosition().x <= 168.33) {
+		moveLeft = false;
+	}
+	else if (player->m_sprite.getPosition().x >= 688.314) {
+		moveRight = false;
+	}
+
+	// First Stage
+
+	if (player->m_sprite.getPosition().x > 369.991 && player->m_sprite.getPosition().x < 378.334) {
+		if (player->m_sprite.getPosition().y < 486.667 && player->m_sprite.getPosition().y > 388.330) {
+			moveLeft = false;
+			moveRight = false;
+
+		}
+		moveUp = true;
+	}
+	if (player->m_sprite.getPosition().x > 369.991 && player->m_sprite.getPosition().x < 378.334 && 
+		player->m_sprite.getPosition().y >= 383.338 && player->m_sprite.getPosition().y <= 384.338) {
+		std::cout << "Je ne peux plus monter 1" << std::endl;
+		moveUp = false;
+	}
+
+	// Second stage 
+	if (player->m_sprite.getPosition().x > 296.661 && player->m_sprite.getPosition().x < 306.661) {
+		if (player->m_sprite.getPosition().y < 380.005  && player->m_sprite.getPosition().y > 278.443 ) {
+			moveLeft = false;
+			moveRight = false;
+
+		}
+		moveUp = true;
+	}
+
+	if (player->m_sprite.getPosition().x > 296.661 && player->m_sprite.getPosition().x < 306.661 &&
+		player->m_sprite.getPosition().y >= 273.343  && player->m_sprite.getPosition().y <= 274.343) {
+		std::cout << "Je ne peux plus monter 2" << std::endl;
+		moveUp = false;
+	}
+
+	//Third Stage
+	if (player->m_sprite.getPosition().x > 166.681 && player->m_sprite.getPosition().x < 236.664) {
+		if (player->m_sprite.getPosition().y < 273.343  && player->m_sprite.getPosition().y > 168.347) {
+			moveLeft = false;
+			moveRight = false;
+
+		}
+		moveUp = true;
+	}
+
+	//Third Stage
+	if (player->m_sprite.getPosition().x > 170 && player->m_sprite.getPosition().x < 172) {
+		if (player->m_sprite.getPosition().y < 168.347  && player->m_sprite.getPosition().y > 56.6851) {
+			moveLeft = false;
+			moveRight = false;
+
+		}
+		moveUp = true;
+	}
+
+}
+
+bool Game::Victory() {
+	std::shared_ptr<Entity> player = EntityManager::GetPlayer();
+
+	if (player->m_sprite.getPosition().x >= mBrunoFernandes.getPosition().x && player->m_sprite.getPosition().y >= mBrunoFernandes.getPosition().y){
+		std::cout << "VICTOIIIIIIIRE" << std::endl;
+		moveUp = false;
+		moveDown = false;
+		moveRight = false;
+		moveLeft = false;
+		return true;
+	}
+
+	return false;
+
 }
 
 void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
@@ -210,6 +340,9 @@ void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 		mIsMovingLeft = isPressed;
 	else if (key == sf::Keyboard::Right)
 		mIsMovingRight = isPressed;
+	else if (Victory() && key == sf::Keyboard::A)
+		RestartGame();
+
 
 	if (key == sf::Keyboard::Space)
 	{
