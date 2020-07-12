@@ -17,6 +17,10 @@ private:
 	void update(sf::Time elapsedTime);
 	void render();
 
+	void MovePlayer();
+	bool Victory();
+	void RestartGame();
+
 	void updateStatistics(sf::Time elapsedTime);
 	void handlePlayerInput(sf::Keyboard::Key key, bool isPressed);
 
@@ -26,9 +30,12 @@ private:
 
 	sf::RenderWindow		mWindow;
 	sf::Texture	mTexture;
+	sf::Texture mTextureBruno;
 	sf::Sprite	mPlayer;
+	sf::Sprite	mBrunoFernandes;
 	sf::Font	mFont;
 	sf::Text	mStatisticsText;
+	sf::Text	mVictory;
 	sf::Time	mStatisticsUpdateTime;
 
 	std::size_t	mStatisticsNumFrames;
@@ -37,12 +44,18 @@ private:
 	bool mIsMovingRight;
 	bool mIsMovingLeft;
 
+	bool moveUp;
+	bool moveDown;
+	bool moveLeft;
+	bool moveRight;
+
 	sf::Texture	_TextureEchelle;
 	sf::Sprite	_Echelle[ECHELLE_COUNT];
 	sf::Texture	_TextureBlock;
 	sf::Sprite	_Block[BLOCK_COUNT_X][BLOCK_COUNT_Y];
 	sf::Texture	_TextureWeapon;
 	sf::Sprite	_Weapon;
+	sf::Vector2u _sizeBrunoFernandes;
 	sf::Vector2u _sizeBlock;
 	sf::Vector2u _sizeMario;
 };

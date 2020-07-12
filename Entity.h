@@ -4,7 +4,8 @@ enum EntityType
 {
 	player,
 	block,
-	echelle
+	echelle,
+	bruno
 };
 
 class Entity
